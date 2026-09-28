@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Churn Prediction</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+            min-height: 100vh;
+            color: #1e293b;
+            display: flex;
+            flex-direction: column;
+        }
+
+        nav {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 16px 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(99, 102, 241, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .nav-brand {
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 700;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-brand span {
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-links a.active {
+            color: #ffffff;
+            background: rgba(99, 102, 241, 0.3);
+            border: 1px solid rgba(129, 140, 248, 0.4);
+        }
+
+        .nav-links a.btn-logout {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .nav-links a.btn-logout:hover {
+            background: rgba(239, 68, 68, 0.25);
+            color: #ffffff;
+        }
+
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 50px 20px;
+        }
+
+        .card {
+            background-color: #ffffff;
+            width: 640px;
+            max-width: 100%;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+        }
+
+        .profile-title h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        .profile-title p {
+            margin: 4px 0 0 0;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0 0 14px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .info-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px 16px;
+        }
+
+        .info-box .info-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .info-box .info-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0f172a;
+            word-break: break-all;
+        }
+
+        .prediction-box {
+            background: linear-gradient(135deg, #eff6ff 0%, #eef2ff 100%);
+            border: 1.5px dashed #818cf8;
+            border-radius: 14px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .prediction-box h2 {
+            margin: 0 0 8px 0;
+            font-size: 18px;
+            color: #312e81;
+            font-weight: 700;
+        }
+
+        .prediction-box p {
+            margin: 0;
+            font-size: 14px;
+            color: #475569;
+            line-height: 1.5;
+        }
+
+        .status-badge {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 5px 14px;
+            background: #e0e7ff;
+            color: #4338ca;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <a href="/dashboard/" class="nav-brand"><span>✦</span> ChurnPredict</a>
+    <div class="nav-links">
+        <a href="/dashboard/" class="active">Home</a>
+        <a href="/logout/" class="btn-logout">Logout</a>
+    </div>
+</nav>
+
+<div class="main-wrapper">
+    <div class="card">
+        <div class="profile-header">
+            <div class="avatar">
+                {{ user.user_name|slice:":1"|upper }}
+            </div>
+            <div class="profile-title">
+                <h1>Welcome, {{ user.user_name }}</h1>
+                <p>Welcome to the Customer Churn Prediction System</p>
+            </div>
+        </div>
+
+        <h3 class="section-title">Your Information</h3>
+
+        <div class="info-grid">
+            <div class="info-box">
+                <div class="info-label">User Name</div>
+                <div class="info-value">{{ user.user_name }}</div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-label">Mobile Number</div>
+                <div class="info-value">{{ user.mobile_number }}</div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-label">Place</div>
+                <div class="info-value">{{ user.place }}</div>
+            </div>
+        </div>
+
+        <div class="prediction-box">
+            <h2>Customer Churn Prediction</h2>
+            <p>
+                The prediction module will be added in the next phase of the project.
+            </p>
+            <span class="status-badge">Phase 1 Active</span>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
